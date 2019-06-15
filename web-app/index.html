@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+  <head>
+    <title>SMOKA</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  </head>
+
+  <body>
+    <div id="tester" style="width:800px;height:400px;"></div>
+    <h3 id="total_wh"></h3>
+    <hr>
+    <pre id="debug"></pre>
+  </body>
+
+  <script>
+    function getData() {
+      return Math.random()
+    }
+
+	TESTER = document.getElementById('tester');
+	Plotly.plot(TESTER, [{
+	  x: [],
+	  y: [] 
+    }], {
+	margin: { t: 0 } } );
+
+  function update_graph(ts, power_mw) {
+    Plotly.extendTraces('tester', { y: [[power_mw / 1000]],
+                                    x: [[ts]]}, [0])
+  }
+
+  function debug(msg) {
+    document.getElementById('debug').textContent = msg + '\n';
+  }
+
+  function deal_wh(msg) {
+    var wh = Number(msg)
+    wh = wh / 1000.0
+    console.log(wh)
+    document.getElementById('total_wh').textContent = "Total Consumption: " + wh + " kW";
+  }
+
+  function deal_unix_ts(msg) {
+    var date = new Date(msg*1000);
+    // var ts = moment.unix(msg).format("MM/DD/YYYY");
+    var clean_date = date.toLocaleString('en-AU', { timeZone: 'Australia/Melbourne' })
+    console.log(clean_date)
+    return clean_date;
+  }
+
+  var ws = new WebSocket('ws://localhost:8001');
+  ws.onopen = function() {
+    debug('CONNECT');
+  };
+  ws.onclose = function() {
+    debug('DISCONNECT');
+  };
+  ws.onmessage = function(event) {
+    debug('MESSAGE: ' + event.data);
+    var data = event.data.split(',');
+    // msg = f"{voltage_mv}, {current_ma}, {power_mw}, {total_wh}"
+    var unix_ts = data[0]
+    var voltage_mv = data[1]
+    var current_ma = data[2]
+    var power_mw = data[3]
+    var total_wh = data[4]
+    deal_wh(total_wh);
+    var ts = deal_unix_ts(unix_ts);
+    update_graph(ts, power_mw)
+  };
+  </script>
+
+</html>
