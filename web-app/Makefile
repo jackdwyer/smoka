@@ -6,3 +6,6 @@ power-consumption-worker:
 
 websocket-publisher:
 	websocketd --port=8001 tail -f results.csv
+
+start-watcher:
+	tail -f results.csv | python watcher.py
