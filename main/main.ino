@@ -1,31 +1,37 @@
 int relay0 = 7;       // relay pin
 int sensorPin = A0;   // select the input pin for the potentiometer
 int sensorValue = 0;  // variable to store the value coming from the sensor
-int LEDTRIGGERED = 12;
 
 int triggered = false;
+const int period = 10;
+unsigned long time_now = 0;
 
 void setup() {
+  Serial.begin(9600);
   pinMode(relay0, OUTPUT);
-  digitalWrite(LEDTRIGGERED, OUTPUT);
-
   digitalWrite(relay0, LOW);
-  digitalWrite(LEDTRIGGERED, LOW);
 }
 
 void loop() {
-  sensorValue = analogRead(sensorPin);
-  if (sensorValue > 800) {
-    triggered = true;
-  } else {
-    triggered = false;
+
+  if(millis() > time_now + period){
+    sensorValue = analogRead(sensorPin);
+    time_now = millis();
+    Serial.print(time_now);
+    Serial.print(",");
+    Serial.println(sensorValue);
+
+
+    if (sensorValue > 800) {
+      triggered = true;
+    } else {
+      triggered = false;
+    }
+    if (triggered) {
+      digitalWrite(relay0, HIGH);
+    } else {
+      digitalWrite(relay0, LOW);
+    }
   }
-  if (triggered) {
-    digitalWrite(relay0, HIGH);
-    digitalWrite(LEDTRIGGERED, HIGH);
-  } else {
-    digitalWrite(relay0, LOW);
-    digitalWrite(LEDTRIGGERED, LOW);
-  }
-  delay(5);
+  // delay(5);
 }
