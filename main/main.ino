@@ -3,7 +3,7 @@ int sensorPin = A0;   // select the input pin for the potentiometer
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 int triggered = false;
-const int period = 10;
+const int period = 30;
 unsigned long time_now = 0;
 
 void setup() {
@@ -13,14 +13,12 @@ void setup() {
 }
 
 void loop() {
-
   if(millis() > time_now + period){
     sensorValue = analogRead(sensorPin);
     time_now = millis();
     Serial.print(time_now);
     Serial.print(",");
     Serial.println(sensorValue);
-
 
     if (sensorValue > 800) {
       triggered = true;
@@ -33,5 +31,4 @@ void loop() {
       digitalWrite(relay0, LOW);
     }
   }
-  // delay(5);
 }
